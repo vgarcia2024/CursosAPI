@@ -15,3 +15,5 @@ global using System.Net.Http;
 global using System.Net.Http.Json;
 global using System.Threading;
 global using System.Threading.Tasks;
+global using BC = BCrypt.Net.BCrypt;
+global using HB = HandlebarsDotNet.Handlebars;

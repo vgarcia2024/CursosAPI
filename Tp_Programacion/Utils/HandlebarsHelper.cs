@@ -7,7 +7,7 @@ namespace Tp_Programacion.Utils
     {
         public static string Render(string source, object data)
         {
-            var template = Handlebars.Compile(source);
+            var template = HB.Compile(source);
             var result = template(data);
             return result;
         }
