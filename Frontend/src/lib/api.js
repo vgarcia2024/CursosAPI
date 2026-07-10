@@ -1,6 +1,6 @@
 import axios from "axios";
 
-// El back de PagoFácil/UTN (CursosAPI) autentica por COOKIE (no JWT), por eso
+// El back de /UTN (CursosAPI) autentica por COOKIE (no JWT), por eso
 // no hay token que guardar: alcanza con withCredentials para que el navegador
 // mande la cookie de sesión en cada request, y que el back la pueda leer.
 export const api = axios.create({
@@ -8,6 +8,7 @@ export const api = axios.create({
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
+    "ngrok-skip-browser-warning": "true",
   },
 });
 

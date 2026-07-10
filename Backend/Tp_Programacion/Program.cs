@@ -101,7 +101,10 @@ var app = builder.Build();
 
 app.UseCors(options =>
 {
-    options.WithOrigins("http://localhost:5173");
+    options.WithOrigins(
+        "http://localhost:5173",
+        "https://cursos-api.vercel.app"
+    );
     options.AllowAnyHeader();
     options.AllowAnyMethod();
     options.AllowCredentials();
