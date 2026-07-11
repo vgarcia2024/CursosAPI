@@ -14,17 +14,18 @@ namespace Tp_Programacion.Config
         public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Role>().HasIndex(x => x.Name).IsUnique();
-
-            modelBuilder.Entity<Role>().HasData(
-                new Role() { Id = 1, Name = "Admin" },
-                new Role() { Id = 2, Name = "UserGratis" },
-                new Role() { Id = 3, Name = "UserPremium" }
-            );
-
-            modelBuilder.Entity<User>().HasIndex(x => x.UserName).IsUnique();
-            modelBuilder.Entity<User>().HasIndex(x => x.Email).IsUnique();
-        }
+	{
+    		modelBuilder.Entity<User>()
+        	.HasMany(u => u.Roles)
+        	.WithMany(); // 
+    	modelBuilder.Entity<Role>().HasIndex(x => x.Name).IsUnique();
+    	modelBuilder.Entity<Role>().HasData(
+        	new Role() { Id = 1, Name = "Admin" },
+        	new Role() { Id = 2, Name = "UserGratis" },
+        	new Role() { Id = 3, Name = "UserPremium" }
+    	);
+    	modelBuilder.Entity<User>().HasIndex(x => x.UserName).IsUnique();
+    	modelBuilder.Entity<User>().HasIndex(x => x.Email).IsUnique();
+	}
     }
 }

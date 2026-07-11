@@ -12,8 +12,8 @@ using Tp_Programacion.Utils;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -27,7 +27,6 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-
 //Services
 builder.Services.AddScoped<CursoService>();
 builder.Services.AddScoped<UserService>();
@@ -38,13 +37,13 @@ builder.Services.AddScoped<IEncoderService, EncoderService>();
 builder.Services.AddScoped<EmailService>();
 
 // Repositories
-
 builder.Services.AddScoped<ICursoRepository, CursoRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRepository<Role>, Repository<Role>>();
 
 //mapper
 builder.Services.AddAutoMapper(cfg => { }, typeof(Mapping));
+
 // DB
 builder.Services.AddDbContext<AppDbContext>(opt =>
 {
@@ -60,7 +59,6 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         opt.Cookie.SameSite = SameSiteMode.None;
         opt.Cookie.IsEssential = true;
         opt.ExpireTimeSpan = TimeSpan.FromDays(1);
-
         // Para que la API devuelva códigos de estado en vez de redirigir a páginas web
         opt.Events.OnRedirectToLogin = ctx =>
         {
@@ -98,6 +96,29 @@ builder.Services.AddResend(o =>
 
 var app = builder.Build();
 
+// Aplica las migraciones pendientes, con reintentos por si SQL Server
+// todavía no terminó de arrancar dentro del contenedor
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+    const int maxRetries = 10;
+    for (int intento = 1; intento <= maxRetries; intento++)
+    {
+        try
+        {
+            db.Database.Migrate();
+            Console.WriteLine("Migraciones aplicadas correctamente.");
+            break;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Intento {intento}/{maxRetries} fallo conectando a la base: {ex.Message}");
+            if (intento == maxRetries) throw;
+            Thread.Sleep(3000); // espera 3 segundos antes de reintentar
+        }
+    }
+}
 
 app.UseCors(options =>
 {
@@ -110,7 +131,6 @@ app.UseCors(options =>
     options.AllowCredentials();
 });
 
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -118,11 +138,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
